@@ -68,3 +68,16 @@ class BinaryCrossEntropy(LossFunction):
         grad = - (y_true / y_pred) + ((1 - y_true) / (1 - y_pred))
         grad = grad / N
         return grad
+
+class BinaryCrossEntropyLossFromLogits(LossFunction):
+    def forward(self, y_pred, y_true, elementwise=False):
+        loss = np.maximum(y_pred, 0) - y_pred * y_true + np.log(1 + np.exp(-np.abs(y_pred)))
+        if not elementwise:
+            loss = np.mean(loss)
+        return loss
+
+    def backward(self, y_pred, y_true):
+        N = y_true.shape[0]
+        sigmoid = 1 / (1 + np.exp(-y_pred))
+        grad = (sigmoid - y_true) / N
+        return grad

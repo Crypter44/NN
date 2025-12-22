@@ -1,5 +1,7 @@
 import numpy as np
 
+from model.activation_function import Sigmoid, ReLU
+
 
 class FullyConnectedLayer:
     def __init__(self, input_dim, output_dim, activation, include_bias=True):
@@ -34,10 +36,11 @@ class FullyConnectedLayer:
         self.cache = {'input': x, 'affine': affine, 'z': z}
         return z
 
-    def backward(self, dout):
+    def backward(self, dout, is_last_layer=False):
         """
         Performs the backward pass of the fully connected layer.
         :param dout: Upstream gradient of shape (N, D_out)
+        :param is_last_layer: Whether this layer is the last layer in the network
         :return: gradient for weights update of shape (D_in, D_out)
         """
         if self.cache is None:
@@ -50,7 +53,11 @@ class FullyConnectedLayer:
         N = x.shape[0]
 
         # Compute grad of activation
-        dZ = dout * self.activation.backward(affine)  # (N, D_out)
+        if is_last_layer and isinstance(self.activation, Sigmoid) and False:
+            # Special case for last layer with Sigmoid activation
+            dZ = dout
+        else:
+            dZ = dout * self.activation.backward(z)  # (N, D_out)
 
         # gradient for weights
         self.grad = (x.T @ dZ) / N  # (D_in+1, D_out)
@@ -62,9 +69,6 @@ class FullyConnectedLayer:
 
         return dX
 
-    def update(self, learning_rate):
-        self.W -= learning_rate * self.grad
-
     def initialize_weights(self, include_bias=True):
         """
         Initialize the weight matrix W
@@ -72,5 +76,17 @@ class FullyConnectedLayer:
         :return: None
         """
         input_dim = self.input_dim + 1 if include_bias else self.input_dim
-        self.W = 0.01 * np.random.randn(input_dim, self.output_dim)
-        #self.W = np.random.uniform(-1, 1, size=(input_dim, self.output_dim))
+
+        if isinstance(self.activation, Sigmoid):
+            # xavier uniform initialization
+            limit = np.sqrt(6 / (input_dim + self.output_dim))
+            self.W = np.random.uniform(-limit, limit, (input_dim, self.output_dim))
+        elif isinstance(self.activation, ReLU):
+            # He initialization
+            self.W = np.random.randn(input_dim, self.output_dim) * np.sqrt(2 / input_dim)
+            # add small bias to avoid dead neurons
+            if include_bias:
+                self.W[-1, :] += 0.01
+        else:
+            # Default to small random values
+            self.W = 0.01 * np.random.randn(input_dim, self.output_dim)

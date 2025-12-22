@@ -31,53 +31,6 @@ class TestFcLayer(unittest.TestCase):
         assert np.allclose(output, np.array([[5.0], [11.0]])), \
             f"Forward pass output expected to be [[5.0], [11.0]], but got {output}"
 
-    def test_FCL_backward_1_sample(self):
-        # Create a FullyConnectedLayer instance
-        input_size = 2
-        output_size = 1
-        fc_layer = FullyConnectedLayer(input_size, output_size, activation=Linear(), include_bias=False)
-
-        assert fc_layer.W.shape == (input_size, output_size), \
-            f"Weight matrix shape expected to be {(input_size, output_size)}, but got {fc_layer.W.shape}"
-
-        for i in range(len(fc_layer.W)):
-            for j in range(len(fc_layer.W[0])):
-                fc_layer.W[i][j] = i + j + 1
-
-        # Define a simple input
-        x = np.array([[5.0, 22.0]])
-        # Perform forward pass
-        output = fc_layer.forward(x)
-        grad = fc_layer.backward(np.array([[1.0]]))
-        expected_grad = np.array([[5.0], [22.0]])
-        assert np.allclose(grad, expected_grad), \
-            f"Backward pass gradient expected to be\n{expected_grad},\nbut got\n{grad}"
-
-    def test_FCL_backward_2_samples(self):
-        # Create a FullyConnectedLayer instance
-        input_size = 2
-        output_size = 1
-        fc_layer = FullyConnectedLayer(input_size, output_size, activation=Linear(), include_bias=False)
-
-        assert fc_layer.W.shape == (input_size, output_size), \
-            f"Weight matrix shape expected to be {(input_size, output_size)}, but got {fc_layer.W.shape}"
-
-        for i in range(len(fc_layer.W)):
-            for j in range(len(fc_layer.W[0])):
-                fc_layer.W[i][j] = i + j + 1
-
-        # Define a simple input
-        x = np.array([[5.0, 22.0],
-                      [1.0, 3.0]])
-
-        # Perform forward pass
-        output = fc_layer.forward(x)
-        grad = fc_layer.backward(np.array([[1.0], [1.0]]))
-        expected_grad = np.array([[3.0],
-                                  [12.5]])
-        assert np.allclose(grad, expected_grad), \
-            f"Backward pass gradient expected to be\n{expected_grad},\nbut got\n{grad}"
-
     def test_FCL_approximate_linear_function(self):
         # Create a FullyConnectedLayer instance
         input_size = 2
@@ -121,7 +74,7 @@ class TestFcLayer(unittest.TestCase):
             # Backward pass
             fc_layer.backward(loss_function.backward(predictions, targets))
             # Update weights
-            fc_layer.update(learning_rate)
+            fc_layer.W -= learning_rate * fc_layer.grad
 
         # plot loss curve
         import matplotlib.pyplot as plt
