@@ -345,6 +345,7 @@ class TestNN(unittest.TestCase):
 
     def test_circle_prediction(self):
         hidden_size = 64
+        radius = 0.5
         nn = NN(
             layer.FullyConnectedLayer(2, hidden_size, activation.ReLU()),
             layer.FullyConnectedLayer(hidden_size, hidden_size, activation.ReLU()),
@@ -353,7 +354,7 @@ class TestNN(unittest.TestCase):
             optimizer=optim.Adam(learning_rate=0.01)
         )
 
-        data = CircleDataset(0.6, 2000, batch_size=256, shuffle=True, drop_last=True, normalize_data=True)
+        data = CircleDataset(radius, 2000, batch_size=256, shuffle=True, drop_last=True, normalize_data=False)
 
         losses, _ = nn.train(data, epochs=250)
 
@@ -367,16 +368,12 @@ class TestNN(unittest.TestCase):
 
         # plot random points, circle and predictions
         import matplotlib.pyplot as plt
-        data = CircleDataset(0.3, 1024, batch_size=50, shuffle=False, drop_last=False, normalize_data=True)
+        data = CircleDataset(radius, 1024, batch_size=50, shuffle=False, drop_last=False, normalize_data=False)
         predictions, l = nn.evaluate(data.data, data.targets)
 
-        print(l)
-        print(predictions.flatten())
-        predictions = (predictions >= 0.5).astype(np.float32)
-        print(predictions.flatten())
-        print(data.targets.flatten())
-        plt.scatter(data.raw_data[:, 0], data.raw_data[:, 1], c=data.targets.flatten(), cmap='coolwarm', edgecolors='k')
-        circle = plt.Circle((0.5, 0.5), 0.3, color='black', fill=False, linestyle='--')
+        #predictions = (predictions >= 0.5).astype(np.float32)
+        plt.scatter(data.raw_data[:, 0], data.raw_data[:, 1], c=predictions.flatten(), cmap='coolwarm', edgecolors='k')
+        circle = plt.Circle((0.5, 0.5), radius, color='black', fill=False, linestyle='--')
         plt.gca().add_artist(circle)
         plt.xlim(0, 1)
         plt.ylim(0, 1)
