@@ -353,9 +353,9 @@ class TestNN(unittest.TestCase):
             optimizer=optim.Adam(learning_rate=0.01)
         )
 
-        data = CircleDataset(0.3, 2000, batch_size=256, shuffle=True, drop_last=True, normalize_data=True)
+        data = CircleDataset(0.6, 2000, batch_size=256, shuffle=True, drop_last=True, normalize_data=True)
 
-        losses, _ = nn.train(data, epochs=250, shuffle=True)
+        losses, _ = nn.train(data, epochs=250)
 
         # plot the loss curve
         import matplotlib.pyplot as plt

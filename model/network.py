@@ -22,7 +22,7 @@ class NN:
         self.loss_function = loss_function
         self.optimizers = {l: deepcopy(optimizer) for l in self.layers}
 
-    def train(self, data, epochs=100):
+    def train(self, data, epochs=100, **kwargs):
         """
         Trains the neural network on the given data for a number of epochs.
 
@@ -30,6 +30,7 @@ class NN:
         shuffle=False, drop_last=False, to simulate full-batch training on the provided data.
         :param data: data to train on (Dataloader or tuple of (data, targets))
         :param epochs: number of epochs to train for
+        :kwargs: additional arguments (not used, but currently needed for backwards compatibility from older versions)
         :return: loss_list: list of losses for each batch,
                  grad_norm_list: list of gradient norms for each layer and batch
         """
