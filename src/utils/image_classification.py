@@ -44,3 +44,32 @@ def plot_images_with_colored_labels(images, labels, ground_truth=None):
 
     plt.tight_layout()
     plt.show()
+
+def plot_image_with_colored_label(image, label, ground_truth=None):
+    """
+    Plots a single image with its label colored based on correctness.
+
+    :param image: A numpy array of shape (H, W) or (H, W, C) containing the image to plot.
+    :param label: The predicted label for the image.
+    :param ground_truth: (Optional) The ground truth label.
+                         If provided, the label will be colored green for correct prediction and red for incorrect one.
+                         If not provided, the label will be colored black.
+    """
+
+    fig, ax = plt.subplots(figsize=(4, 4))
+    ax.axis('off')
+
+    if ground_truth is not None:
+        color = 'green' if label == ground_truth else 'red'
+    else:
+        color = 'black'
+
+    if image.ndim == 2:  # Grayscale image
+        ax.imshow(image, cmap='gray')
+    else:  # Color image
+        ax.imshow(image)
+
+    ax.set_title(f'Label: {label}', color=color)
+
+    plt.tight_layout()
+    plt.show()

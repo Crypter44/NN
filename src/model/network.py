@@ -1,6 +1,6 @@
 import warnings
 from copy import deepcopy
-
+import pickle
 import numpy as np
 from tqdm import tqdm
 
@@ -109,3 +109,14 @@ class NN:
         predictions = self.predict(data)
         loss = self.loss_function(predictions, targets)
         return predictions, loss
+
+    def save_weights(self, filepath):
+        weights = [layer.W for layer in self.layers]
+        with open(filepath + ".pkl", "wb") as f:
+            pickle.dump(weights, f)
+
+    def load_weights(self, filepath):
+        with open(filepath + ".pkl", "rb") as f:
+            weights = pickle.load(f)
+        for w, layer in zip(weights, self.layers):
+            layer.W = w

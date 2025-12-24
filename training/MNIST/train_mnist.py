@@ -7,6 +7,7 @@ from src.model.loss_function import SoftmaxCrossEntropy
 from src.model.network import NN
 from src.model.optimizer import Adam
 from src.utils.image_classification import plot_images_with_colored_labels
+from src.utils.number_painter_MNIST import MNISTDrawer
 from src.utils.utils import plot_loss_curve, set_seed
 
 set_seed(526)
@@ -16,7 +17,7 @@ data = MNISTDataset(
     batch_size=64,
     shuffle=True,
     drop_last=True,
-    normalize_data=True,
+    normalize_data=False,
 )
 
 print("MNIST train dataset loaded.")
@@ -56,7 +57,7 @@ test_data = MNISTDataset(
     batch_size=-1,
     shuffle=False,
     drop_last=False,
-    normalize_data=True,
+    normalize_data=False,
 )
 
 test_images, test_labels = next(iter(test_data))
@@ -65,3 +66,5 @@ test_predictions = nn(test_images).argmax(axis=1).astype(int)
 # calculate test accuracy
 test_accuracy = np.mean(test_predictions == test_labels.argmax(axis=1).astype(int))
 print(f"Test accuracy: {test_accuracy * 100:.2f}%")
+
+nn.save_weights("weights")
