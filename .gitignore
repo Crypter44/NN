@@ -1,4 +1,6 @@
 .venv
 .idea
 
+downloaded_data/
+
 *.mp4
