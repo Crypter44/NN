@@ -3,11 +3,11 @@ import unittest
 
 import numpy as np
 
-from model.activation_function import ReLU, Linear
-from model.loss_function import MeanSquaredError
-from model.network import NN
-from model.layer import FullyConnectedLayer
-from model.optimizer import Adam
+from src.model.activation_function import ReLU, Linear
+from src.model.loss_function import MeanSquaredError
+from src.model.network import NN
+from src.model.layer import FullyConnectedLayer
+from src.model.optimizer import Adam
 
 
 class RuntimeTest(unittest.TestCase):

@@ -1,7 +1,10 @@
-import numpy as np
+from pathlib import Path
 
-from dataloader.dataloader import Dataloader
-from matplotlib.path import Path
+import numpy as np
+from matplotlib.path import Path as MatplotlibPath
+from torchvision import datasets
+
+from src.dataloader.dataloader import Dataloader
 
 
 class CircleDataset(Dataloader):
@@ -80,7 +83,7 @@ class PolygonDataset(Dataloader):
             radii = radii[order]
 
             polygon_vertices = np.column_stack((radii * np.cos(angle), radii * np.sin(angle)))
-        polygon_path = Path(polygon_vertices)
+        polygon_path = MatplotlibPath(polygon_vertices)
 
         data = np.random.rand(n_points, 2) * 2 - 1  # Points in [-1, 1] x [-1, 1]
         inside_polygon = polygon_path.contains_points(data)
@@ -145,3 +148,44 @@ class SpiralDataset(Dataloader):
 
         return data, targets
 
+
+class MNISTDataset(Dataloader):
+    """
+    MNIST handwritten digit dataset wrapped into the custom Dataloader class.
+    Loads the train or test split, flattens to vectors of size 784, and normalizes to [0, 1].
+    """
+
+    def __init__(self, train=True, batch_size=64, shuffle=True, drop_last=True, normalize_data=True, root=None):
+        if root is None:
+            BASE_DIR = Path(__file__).parent
+            DATA_DIR = BASE_DIR / "downloaded_data"
+            root = DATA_DIR.as_posix()
+
+        self.train = train
+
+        data, targets = self.load_mnist(root, train=train)
+        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last,
+                         normalize_data=normalize_data)
+
+    @staticmethod
+    def load_mnist(root, train=True):
+        """
+        Download (if needed) and load the MNIST dataset into numpy arrays.
+        :return:
+            data: shape (N, 784), float32
+            targets: shape (N, 1), float32
+        """
+        dataset = datasets.MNIST(root=root, train=train, download=True)
+
+        # Tensor -> numpy
+        data = dataset.data.numpy().astype(np.float32)
+        targets = dataset.targets.numpy().astype(np.int64)
+
+        # Flatten images from 28x28 to 784
+        data = data.reshape(len(data), -1)
+
+        # Make targets one-hot encoded
+        targets_one_hot = np.zeros((len(targets), 10), dtype=np.float32)
+        targets_one_hot[np.arange(len(targets)), targets] = 1
+
+        return data, targets_one_hot

@@ -81,3 +81,39 @@ class BinaryCrossEntropyLossFromLogits(LossFunction):
         sigmoid = 1 / (1 + np.exp(-y_pred))
         grad = (sigmoid - y_true) / N
         return grad
+
+class SoftmaxCrossEntropy(LossFunction):
+    def forward(self, y_pred, y_true, elementwise=False):
+        """
+        Compute the Softmax Cross Entropy loss.
+
+        :param elementwise: If True, return the loss for each element; otherwise, return the mean loss.
+        :param y_pred: Predicted logits, shape (N, C) where C is number of classes
+        :param y_true: True one-hot encoded labels, shape (N, C)
+        :return: Softmax Cross Entropy loss
+        """
+        # Stabilize logits by subtracting max
+        shifted_logits = y_pred - np.max(y_pred, axis=1, keepdims=True)
+        Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True)
+        log_probs = shifted_logits - np.log(Z)
+        loss = -np.sum(y_true * log_probs, axis=1, keepdims=True)
+        if not elementwise:
+            loss = np.mean(loss)
+        return loss
+
+    def backward(self, y_pred, y_true):
+        """
+        Compute the gradient of the Softmax Cross Entropy loss with respect to y_pred.
+
+        :param y_pred: Predicted logits, shape (N, C) where C is number of classes
+        :param y_true: True one-hot encoded labels, shape (N, C)
+        :return: Gradient of the loss with respect to y_pred, shape (N, C)
+        """
+        # Stabilize logits by subtracting max
+        shifted_logits = y_pred - np.max(y_pred, axis=1, keepdims=True)
+        Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True)
+        softmax = np.exp(shifted_logits) / Z
+        N = y_true.shape[0]
+        grad = (softmax - y_true) / N
+        return grad
+

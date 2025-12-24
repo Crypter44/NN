@@ -3,8 +3,8 @@ import tqdm
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-from dataloader.dataloader import Dataloader
-from model.network import NN
+from src.dataloader.dataloader import Dataloader
+from src.model.network import NN
 
 
 class BinaryClassification2DProblem:

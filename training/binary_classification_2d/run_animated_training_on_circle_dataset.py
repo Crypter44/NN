@@ -1,13 +1,10 @@
 import numpy as np
 
-from model import layer
-from model.network import NN
-from model import activation_function as activation
-from model import loss_function as loss
-from model import optimizer as optim
-from dataloader.datasets import CircleDataset, PolygonDataset, SpiralDataset
+from src.model.network import NN
+from src.model import optimizer as optim, loss_function as loss, layer, activation_function as activation
+from src.dataloader.datasets import CircleDataset, PolygonDataset, SpiralDataset
 
-from utils import binary_classification_problem_2d as bcp2d
+from src.utils import binary_classification_problem_2d as bcp2d
 
 hidden_size = 64
 radius = 0.5

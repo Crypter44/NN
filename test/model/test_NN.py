@@ -2,12 +2,12 @@ import numpy as np
 import pytest
 from _pytest import unittest
 
-from dataloader.datasets import CircleDataset
-from model.network import NN
-import model.layer as layer
-import model.activation_function as activation
-import model.loss_function as loss
-import model.optimizer as optim
+from src.dataloader.datasets import CircleDataset
+from src.model.network import NN
+import src.model.layer as layer
+import src.model.activation_function as activation
+import src.model.loss_function as loss
+import src.model.optimizer as optim
 
 
 @pytest.fixture(autouse=True)

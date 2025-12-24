@@ -22,7 +22,7 @@ class Dataloader:
         self.targets = targets
         self.index = 0
         self.indices = list(range(len(self.data)))
-        self.batch_size = batch_size
+        self.batch_size = batch_size if batch_size > 0 else len(self.data)
         self.shuffle = shuffle
         self.drop_last = drop_last
 

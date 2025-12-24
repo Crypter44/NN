@@ -1,6 +1,6 @@
 from _pytest import unittest
 
-from model.optimizer import Adam
+from src.model.optimizer import Adam
 
 
 class TestOptimizerDeepcopy(unittest.TestCase):

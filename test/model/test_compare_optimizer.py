@@ -1,10 +1,9 @@
 import numpy as np
 from _pytest import unittest
 
-from dataloader.dataloader import Dataloader
-from dataloader.datasets import CircleDataset
-from model import layer, activation_function as activation, loss_function as loss, optimizer as optim
-from model.network import NN
+from src.dataloader.datasets import CircleDataset
+from src.model import optimizer as optim, loss_function as loss, layer, activation_function as activation
+from src.model.network import NN
 
 
 class OptimizerTest(unittest.TestCase):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from model.activation_function import Sigmoid, ReLU
+from src.model.activation_function import Sigmoid, ReLU
 
 
 class FullyConnectedLayer:

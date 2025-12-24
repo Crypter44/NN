@@ -2,8 +2,9 @@ import warnings
 from copy import deepcopy
 
 import numpy as np
+from tqdm import tqdm
 
-from dataloader.dataloader import Dataloader
+from src.dataloader.dataloader import Dataloader
 
 
 class NN:
@@ -47,7 +48,11 @@ class NN:
         loss_list = []
         grad_norm_list = []
 
-        for epoch in range(epochs):
+        pbar = tqdm(range(epochs), desc="Training", unit="epoch")
+
+        for epoch in pbar:
+            batch_loss_list = []
+            batch_grad_norm_list = []
             for batch in data:
                 data_batch, targets_batch = batch
                 # Forward pass
@@ -57,7 +62,7 @@ class NN:
 
                 # Compute loss
                 loss = self.loss_function(output, targets_batch)
-                loss_list.append(loss)
+                batch_loss_list.append(loss)
 
                 # Backward pass
                 grad = self.loss_function.backward(output, targets_batch)
@@ -67,8 +72,10 @@ class NN:
                     if last_layer:
                         last_layer = False
                     grad = layer.backward(grad)
-                    grad_norm_list.append(np.linalg.norm(grad))
+                    batch_grad_norm_list.append(np.linalg.norm(grad))
                     layer.W = self.optimizers[layer].update(layer.W, layer.grad)
+            loss_list.append(np.mean(batch_loss_list))
+            grad_norm_list.append(np.mean(batch_grad_norm_list))
 
         return loss_list, grad_norm_list
 

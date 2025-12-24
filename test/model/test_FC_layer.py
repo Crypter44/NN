@@ -1,9 +1,9 @@
 import numpy as np
 from _pytest import unittest
 
-from model.layer import FullyConnectedLayer
-from model.activation_function import Linear
-from model.loss_function import MeanSquaredError
+from src.model.layer import FullyConnectedLayer
+from src.model.activation_function import Linear
+from src.model.loss_function import MeanSquaredError
 
 
 class TestFcLayer(unittest.TestCase):

@@ -1,7 +1,7 @@
 from _pytest import unittest
 import numpy as np
 
-from dataloader.dataloader import Dataloader
+from src.dataloader.dataloader import Dataloader
 
 
 class TestDataLoader(unittest.TestCase):
