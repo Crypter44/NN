@@ -76,6 +76,7 @@ class NN:
                     layer.W = self.optimizers[layer].update(layer.W, layer.grad)
             loss_list.append(np.mean(batch_loss_list))
             grad_norm_list.append(np.mean(batch_grad_norm_list))
+            pbar.set_postfix({'loss': np.round(loss_list[-1], 4), 'grad_norm': np.round(grad_norm_list[-1], 4)})
 
         return loss_list, grad_norm_list
 

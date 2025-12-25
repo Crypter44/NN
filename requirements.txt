@@ -2,3 +2,4 @@ numpy~=2.4.0
 pytest~=9.0.2
 matplotlib
 tqdm
+torchvision

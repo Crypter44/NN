@@ -2,9 +2,19 @@ from copy import deepcopy
 
 import numpy as np
 
+from src.dataloader.transformation import Transformation
+
 
 class Dataloader:
-    def __init__(self, data, targets, batch_size=8, shuffle=True, drop_last=False, normalize_data=False):
+    def __init__(
+            self,
+            data,
+            targets,
+            batch_size=8,
+            shuffle=True,
+            drop_last=False,
+            transformation: Transformation | None = None
+    ):
         """
         Initializes the dataloader with data.
 
@@ -15,11 +25,15 @@ class Dataloader:
         :param batch_size: size of each batch
         :param shuffle: whether to shuffle the data at the start of each epoch
         :param drop_last: whether to drop the last batch if it's smaller than batch_size
-        :param normalize_data: whether to normalize the data
         """
         self.raw_data = deepcopy(data)
         self.data = data
         self.targets = targets
+
+        self.transformation = transformation
+        if self.transformation:
+            self.data = self.transformation(self.data)
+
         self.index = 0
         self.indices = list(range(len(self.data)))
         self.batch_size = batch_size if batch_size > 0 else len(self.data)
@@ -28,10 +42,6 @@ class Dataloader:
 
         if self.shuffle:
             self.shuffle_data()
-
-        if normalize_data:
-            mean, std = self.calculate_mean_std()
-            self.normalize(mean, std)
 
     def shuffle_data(self):
         """
@@ -54,8 +64,8 @@ class Dataloader:
         Calculates the mean and std of the data.
         :return: mean, std
         """
-        mean = np.mean(self.data, axis=(0,1), keepdims=True)
-        std = np.std(self.data, axis=(0,1), keepdims=True)
+        mean = np.mean(self.data, axis=(0, 1), keepdims=True)
+        std = np.std(self.data, axis=(0, 1), keepdims=True)
         return mean, std
 
     def __iter__(self):

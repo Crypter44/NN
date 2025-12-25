@@ -15,13 +15,12 @@ class CircleDataset(Dataloader):
     Points inside the circle are labeled as 0, points outside the circle are labeled as 1.
     """
 
-    def __init__(self, radius, num_points, batch_size=64, shuffle=True, drop_last=True, normalize_data=True):
+    def __init__(self, radius, num_points, batch_size=64, shuffle=True, drop_last=True, transformation=None):
         self.radius = radius
         self.num_points = num_points
 
         data, targets = self.generate_circle_data(radius, num_points)
-        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last,
-                         normalize_data=normalize_data)
+        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, transformation=transformation)
 
     @staticmethod
     def generate_circle_data(radius, n_points=200):
@@ -46,15 +45,13 @@ class PolygonDataset(Dataloader):
     Points inside the polygon are labeled as 0, points outside the polygon are labeled as 1.
     """
 
-    def __init__(self, num_points, polygon_vertices=None, num_sides=8, batch_size=64, shuffle=True, drop_last=True,
-                 normalize_data=True):
+    def __init__(self, num_points, polygon_vertices=None, num_sides=8, batch_size=64, shuffle=True, drop_last=True, transformation=None):
         self.num_sides = num_sides
         self.num_points = num_points
 
         data, targets, polygon = self.generate_polygon_data(polygon_vertices, num_sides, num_points)
         self.polygon_vertices = polygon
-        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last,
-                         normalize_data=normalize_data)
+        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, transformation=transformation)
 
     @staticmethod
     def generate_polygon_data(polygon_vertices=None, num_sides=8, n_points=200):
@@ -100,15 +97,13 @@ class SpiralDataset(Dataloader):
     Points inside the spiral are labeled as 0, points outside the spiral are labeled as 1.
     """
 
-    def __init__(self, num_points, turns=3, noise=0.1, batch_size=64, shuffle=True, drop_last=True,
-                 normalize_data=True):
+    def __init__(self, num_points, turns=3, noise=0.1, batch_size=64, shuffle=True, drop_last=True, transformation=None):
         self.turns = turns
         self.num_points = num_points
         self.noise = noise
 
         data, targets = self.generate_spiral_data(turns, num_points)
-        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last,
-                         normalize_data=normalize_data)
+        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, transformation=transformation)
 
     @staticmethod
     def generate_spiral_data(turns=3, n_points=200, scale=0.9, width=0.1):
@@ -155,7 +150,7 @@ class MNISTDataset(Dataloader):
     Loads the train or test split, flattens to vectors of size 784, and normalizes to [0, 1].
     """
 
-    def __init__(self, train=True, batch_size=64, shuffle=True, drop_last=True, normalize_data=True, root=None):
+    def __init__(self, train=True, root=None, batch_size=64, shuffle=True, drop_last=True, transformation=None):
         if root is None:
             BASE_DIR = Path(__file__).parent
             DATA_DIR = BASE_DIR / "downloaded_data"
@@ -164,8 +159,8 @@ class MNISTDataset(Dataloader):
         self.train = train
 
         data, targets = self.load_mnist(root, train=train)
-        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last,
-                         normalize_data=normalize_data)
+        print(data.shape, targets.shape)
+        super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, transformation=transformation)
 
     @staticmethod
     def load_mnist(root, train=True):
@@ -180,9 +175,6 @@ class MNISTDataset(Dataloader):
         # Tensor -> numpy
         data = dataset.data.numpy().astype(np.float32)
         targets = dataset.targets.numpy().astype(np.int64)
-
-        # Flatten images from 28x28 to 784
-        data = data.reshape(len(data), -1)
 
         # Make targets one-hot encoded
         targets_one_hot = np.zeros((len(targets), 10), dtype=np.float32)

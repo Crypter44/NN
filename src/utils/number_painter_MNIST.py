@@ -11,9 +11,9 @@ class MNISTDrawer:
     def __init__(self, trained_nn: NN):
         self.trained_nn = trained_nn
 
-        self.canvas_size = 280      # big canvas for drawing
-        self.scale = 10             # 28*10 = 280
-        self.thumb_size = 28        # network input size
+        self.canvas_size = 400      # big canvas for drawing
+        self.scale = 10
+        self.thumb_size = 40        # network input size
 
         self.img = Image.new("L", (self.canvas_size, self.canvas_size), color=0)
         self.draw = ImageDraw.Draw(self.img)
@@ -43,7 +43,7 @@ class MNISTDrawer:
 
     def paint(self, event):
         x, y = event.x, event.y
-        r = 8
+        r = 13
         self.canvas.create_oval(x-r, y-r, x+r, y+r, fill="white", outline="white")
         self.draw.ellipse([x-r, y-r, x+r, y+r], fill=255)
         self.update_preview()

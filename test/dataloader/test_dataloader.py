@@ -10,14 +10,14 @@ class TestDataLoader(unittest.TestCase):
         data = np.array(list(range(10)))
         targets = np.array(list(range(10, 20)))
 
-        dataloader = Dataloader(data, targets, batch_size=1, shuffle=False, drop_last=False, normalize_data=False)
+        dataloader = Dataloader(data, targets, batch_size=1, shuffle=False, drop_last=False)
 
     def test_dataloader_iteration(self):
 
         data = np.array(list(range(10)))
         targets = np.array(list(range(10, 20)))
 
-        dataloader = Dataloader(data, targets, batch_size=1, shuffle=False, drop_last=False, normalize_data=False)
+        dataloader = Dataloader(data, targets, batch_size=1, shuffle=False, drop_last=False)
 
         for i, batch in enumerate(dataloader):
             data, targets = batch
@@ -31,7 +31,7 @@ class TestDataLoader(unittest.TestCase):
         data = np.array(list(range(10)))
         targets = np.array(list(range(10, 20)))
 
-        dataloader = Dataloader(data, targets, batch_size=3, shuffle=False, drop_last=False, normalize_data=False)
+        dataloader = Dataloader(data, targets, batch_size=3, shuffle=False, drop_last=False)
 
         expected_batches = [
             (np.array([0, 1, 2]), np.array([10, 11, 12])),
@@ -51,7 +51,7 @@ class TestDataLoader(unittest.TestCase):
         data = np.array(list(range(10)))
         targets = np.array(list(range(10, 20)))
 
-        dataloader = Dataloader(data, targets, batch_size=3, shuffle=False, drop_last=True, normalize_data=False)
+        dataloader = Dataloader(data, targets, batch_size=3, shuffle=False, drop_last=True)
 
         expected_batches = [
             (np.array([0, 1, 2]), np.array([10, 11, 12])),
@@ -65,29 +65,12 @@ class TestDataLoader(unittest.TestCase):
             assert np.array_equal(data, expected_data)
             assert np.array_equal(targets, expected_targets)
 
-    def test_dataloader_normalization(self):
-
-        data = np.array([[1.0], [2.0], [3.0], [4.0], [5.0]])
-        targets = np.array([[10.0], [11.0], [12.0], [13.0], [14.0]])
-
-        dataloader = Dataloader(data, targets, batch_size=1, shuffle=False, drop_last=False, normalize_data=True)
-
-        mean = np.mean(data)
-        std = np.std(data)
-
-        for i, batch in enumerate(dataloader):
-            data_batch, targets_batch = batch
-            expected_data = (data[i] - mean) / std
-            assert np.allclose(data_batch, expected_data, atol=1e-6)
-            assert np.array_equal(targets_batch.flatten(), targets[i]), \
-                f"Targets do not match for batch {i} expected {targets[i]}, got {targets_batch}"
-
     def test_dataloader_shuffle(self):
 
         data = np.array(list(range(100)))
         targets = np.array(list(range(100, 200)))
 
-        dataloader = Dataloader(data, targets, batch_size=10, shuffle=True, drop_last=False, normalize_data=False)
+        dataloader = Dataloader(data, targets, batch_size=10, shuffle=True, drop_last=False)
 
         all_data = set()
         all_targets = set()

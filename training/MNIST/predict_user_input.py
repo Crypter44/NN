@@ -6,7 +6,7 @@ from src.model.optimizer import Adam
 from src.utils.number_painter_MNIST import MNISTDrawer
 
 nn = NN(
-    FullyConnectedLayer(784, 512, activation=ReLU()),
+    FullyConnectedLayer(1600, 512, activation=ReLU()),
     FullyConnectedLayer(512, 64, activation=ReLU()),
     FullyConnectedLayer(64, 10, activation=Linear()),
     loss_function=SoftmaxCrossEntropy(),
