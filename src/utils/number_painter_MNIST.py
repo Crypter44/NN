@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageOps, ImageTk
 import numpy as np
 from matplotlib import pyplot as plt
 
+from src.model.activation_function import Softmax
 from src.model.network import NN
 from src.utils.image_classification import plot_image_with_colored_label
 
@@ -33,8 +34,11 @@ class MNISTDrawer:
         self.preview_label = tk.Label(right_frame)
         self.preview_label.pack(pady=10)
 
-        self.predict_label = tk.Label(right_frame)
+        # create a 10 class bar chart for prediction
+        self.predict_label = tk.Label(right_frame, text="Predicted Digit: ", font=("Arial", 16))
         self.predict_label.pack(pady=10)
+        self.predict_canvas = tk.Canvas(right_frame, width=200, height=200)
+        self.predict_canvas.pack()
 
         self.clear_button = tk.Button(right_frame, text="Clear", command=self.clear)
         self.clear_button.pack(pady=10)
@@ -64,6 +68,21 @@ class MNISTDrawer:
         output = self.trained_nn(img_array.reshape(1, -1))
         predicted_digit = np.argmax(output, axis=1)[0]
         self.predict_label.config(text=f"Predicted Digit: {predicted_digit}")
+
+        # Plot prediction probabilities
+        self.predict_canvas.delete("all")
+        probs = Softmax().forward(output)
+        probs = probs.flatten()
+        bar_width = 15
+        max_height = 150
+        for i in range(10):
+            bar_height = probs[i] * max_height
+            x0 = 10 + i * (bar_width + 5)
+            y0 = 180 - bar_height
+            x1 = x0 + bar_width
+            y1 = 180
+            self.predict_canvas.create_rectangle(x0, y0, x1, y1, fill="blue")
+            self.predict_canvas.create_text(x0 + bar_width/2, 190, text=str(i))
 
     def clear(self):
         self.canvas.delete("all")
