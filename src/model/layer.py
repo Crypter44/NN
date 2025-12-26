@@ -2,8 +2,15 @@ import numpy as np
 
 from src.model.activation_function import Sigmoid, ReLU
 
+class Layer:
+    def forward(self, x):
+        raise NotImplementedError
 
-class FullyConnectedLayer:
+    def backward(self, dout, is_last_layer=False):
+        raise NotImplementedError
+
+
+class FullyConnectedLayer(Layer):
     def __init__(self, input_dim, output_dim, activation, include_bias=True):
         """
         Initializes the fully connected layer.
@@ -52,12 +59,7 @@ class FullyConnectedLayer:
         z = self.cache['z']
         N = x.shape[0]
 
-        # Compute grad of activation
-        if is_last_layer and isinstance(self.activation, Sigmoid) and False:
-            # Special case for last layer with Sigmoid activation
-            dZ = dout
-        else:
-            dZ = dout * self.activation.backward(z)  # (N, D_out)
+        dZ = dout * self.activation.backward(z)  # (N, D_out)
 
         # gradient for weights
         self.grad = (x.T @ dZ) / N  # (D_in+1, D_out)

@@ -50,24 +50,6 @@ class Dataloader:
         """
         self.indices = np.random.permutation(self.indices)
 
-    def normalize(self, mean, std):
-        """
-        Normalizes the data with given mean and std.
-        :param mean: the mean to normalize with
-        :param std: the std to normalize with
-        :return: None
-        """
-        self.data = (self.data - mean) / std
-
-    def calculate_mean_std(self):
-        """
-        Calculates the mean and std of the data.
-        :return: mean, std
-        """
-        mean = np.mean(self.data, axis=(0, 1), keepdims=True)
-        std = np.std(self.data, axis=(0, 1), keepdims=True)
-        return mean, std
-
     def __iter__(self):
         """
         Initializes the iterator.
@@ -103,6 +85,37 @@ class Dataloader:
         batch = (batch, targets)
         self.index += self.batch_size
         return batch
+
+    def __getitem__(self, item):
+        """
+        Gets the data and targets at the given index or slice.
+        :param item: index or slice
+        :return: data and targets at the given index or slice
+        """
+        batch = self.data[item]
+        targets = self.targets[item]
+        return batch, targets
+
+    @staticmethod
+    def train_and_eval_split(data, targets, train_fraction=0.8, **dataloader_kwargs):
+        """
+        Splits the data into training and evaluation sets, and returns two Dataloaders.
+        :param data: data in form of numpy array
+        :param targets: targets in form of numpy array
+        :param train_fraction: fraction of data to use for training
+        :param dataloader_kwargs: additional arguments to pass to the Dataloader constructor
+        :return: train_dataloader, eval_dataloader
+        """
+        num_train = int(len(data) * train_fraction)
+        train_data = data[:num_train]
+        train_targets = targets[:num_train]
+        eval_data = data[num_train:]
+        eval_targets = targets[num_train:]
+
+        train_dataloader = Dataloader(train_data, train_targets, **dataloader_kwargs)
+        eval_dataloader = Dataloader(eval_data, eval_targets, **dataloader_kwargs)
+
+        return train_dataloader, eval_dataloader
 
     def print(self, include_data=False):
         """

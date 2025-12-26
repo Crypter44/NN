@@ -354,7 +354,7 @@ class TestNN(unittest.TestCase):
             optimizer=optim.Adam(learning_rate=0.01)
         )
 
-        data = CircleDataset(radius, 2000, batch_size=256, shuffle=True, drop_last=True, normalize_data=False)
+        data = CircleDataset(radius, 2000, batch_size=256, shuffle=True, drop_last=True)
 
         losses, _ = nn.train(data, epochs=250)
 
@@ -368,7 +368,7 @@ class TestNN(unittest.TestCase):
 
         # plot random points, circle and predictions
         import matplotlib.pyplot as plt
-        data = CircleDataset(radius, 1024, batch_size=50, shuffle=False, drop_last=False, normalize_data=False)
+        data = CircleDataset(radius, 1024, batch_size=50, shuffle=False, drop_last=False)
         predictions, l = nn.evaluate(data.data, data.targets)
 
         #predictions = (predictions >= 0.5).astype(np.float32)
