@@ -1,8 +1,8 @@
 import numpy as np
 from _pytest import unittest
 
-from src.model.layer import FullyConnectedLayer
-from src.model.activation_function import Linear
+from src.model import module as mdl
+from src.model import optimizer as optim
 from src.model.loss_function import MeanSquaredError
 
 
@@ -11,7 +11,7 @@ class TestFcLayer(unittest.TestCase):
         # Create a FullyConnectedLayer instance
         input_size = 2
         output_size = 1
-        fc_layer = FullyConnectedLayer(input_size, output_size, activation=Linear(), include_bias=False)
+        fc_layer = mdl.Linear(input_size, output_size, include_bias=False)
 
         assert fc_layer.W.shape == (input_size, output_size), \
             f"Weight matrix shape expected to be {(input_size, output_size)}, but got {fc_layer.W.shape}"
@@ -35,7 +35,7 @@ class TestFcLayer(unittest.TestCase):
         # Create a FullyConnectedLayer instance
         input_size = 2
         output_size = 1
-        fc_layer = FullyConnectedLayer(input_size, output_size, activation=Linear(), include_bias=True)
+        fc_layer = mdl.Linear(input_size, output_size, include_bias=True)
 
         data = np.array([[0.0, 0.0],
                          [1.0, 1.0],
@@ -63,6 +63,8 @@ class TestFcLayer(unittest.TestCase):
         loss_function = MeanSquaredError()
         epochs = 50000
         training_loss = []
+        optimizer = optim.Adam(learning_rate=learning_rate)
+        optimizer.register_parameters(fc_layer.parameters())
         for epoch in range(epochs):
             # Forward pass
             predictions = fc_layer.forward(data)
@@ -74,7 +76,8 @@ class TestFcLayer(unittest.TestCase):
             # Backward pass
             fc_layer.backward(loss_function.backward(predictions, targets))
             # Update weights
-            fc_layer.W -= learning_rate * fc_layer.grad
+            optimizer.step()
+            optimizer.zero_grad()
 
         # plot loss curve
         import matplotlib.pyplot as plt

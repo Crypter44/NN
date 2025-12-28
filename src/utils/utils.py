@@ -27,3 +27,14 @@ def set_seed(seed):
 
     np.random.seed(seed)
     random.seed(seed)
+
+def outdated(obj):
+    if isinstance(obj, type):  # class
+        class Wrapper(obj):
+            def __init__(self, *args, **kwargs):
+                raise RuntimeError(f"{obj.__name__} is outdated and must not be used.")
+        return Wrapper
+    else:  # function
+        def wrapper(*args, **kwargs):
+            raise RuntimeError(f"{obj.__name__} is outdated and must not be used.")
+        return wrapper

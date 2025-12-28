@@ -3,7 +3,7 @@ import numpy as np
 from src.dataloader.datasets import MNISTDataset
 from src.dataloader.transformation import RandomTranslationWithPadding, ChainTransformation, Flatten
 from src.model.activation_function import ReLU, Linear
-from src.model.layer import FullyConnectedLayer
+from src.model.module import Linear
 from src.model.loss_function import SoftmaxCrossEntropy
 from src.model.network import NN
 from src.model.optimizer import Adam
@@ -27,9 +27,9 @@ data = MNISTDataset(
 print("MNIST train dataset loaded.")
 
 nn = NN(
-    FullyConnectedLayer(1600, 512, activation=ReLU()),
-    FullyConnectedLayer(512, 64, activation=ReLU()),
-    FullyConnectedLayer(64, 10, activation=Linear()),
+    Linear(1600, 512, activation=ReLU()),
+    Linear(512, 64, activation=ReLU()),
+    Linear(64, 10, activation=Linear()),
     loss_function=SoftmaxCrossEntropy(),
     optimizer=Adam(learning_rate=0.001),
 )

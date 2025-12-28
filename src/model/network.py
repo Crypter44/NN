@@ -12,16 +12,16 @@ class NN:
         """
         Initializes the neural network with given layers, loss function and optimizer.
 
-        At the moment, the optimizer is copied for each layer, so each layer has its own optimizer instance.
-        This allows for optimizers that maintain state (e.g. momentum, Adam, etc.).
-        Later on, this may be changed to allow for more flexible optimizer assignment.
         :param layers: layers of the neural network (in order and as separate arguments)
         :param loss_function: loss function to use
         :param optimizer: optimizer to use for all layers
         """
         self.layers = layers
         self.loss_function = loss_function
-        self.optimizers = {l: deepcopy(optimizer) for l in self.layers}
+        self.optimizer = optimizer
+
+        for layer in self.layers:
+            self.optimizer.register_parameters(layer.parameters())
 
     def train(self, data, epochs=100, **kwargs):
         """
@@ -66,14 +66,11 @@ class NN:
 
                 # Backward pass
                 grad = self.loss_function.backward(output, targets_batch)
-                last_layer = True
                 for layer in reversed(self.layers):
-                    layer.backward(grad, is_last_layer=last_layer)
-                    if last_layer:
-                        last_layer = False
                     grad = layer.backward(grad)
                     batch_grad_norm_list.append(np.linalg.norm(grad))
-                    layer.W = self.optimizers[layer].update(layer.W, layer.grad)
+                self.optimizer.step()
+                self.optimizer.zero_grad()
             loss_list.append(np.mean(batch_loss_list))
             grad_norm_list.append(np.mean(batch_grad_norm_list))
             pbar.set_postfix({'loss': np.round(loss_list[-1], 4), 'grad_norm': np.round(grad_norm_list[-1], 4)})

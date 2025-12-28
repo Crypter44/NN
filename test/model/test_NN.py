@@ -4,7 +4,7 @@ from _pytest import unittest
 
 from src.dataloader.datasets import CircleDataset
 from src.model.network import NN
-import src.model.layer as layer
+import src.model.module as layer
 import src.model.activation_function as activation
 import src.model.loss_function as loss
 import src.model.optimizer as optim
@@ -18,8 +18,10 @@ def set_seed():
 class TestNN(unittest.TestCase):
     def test_linear_function_fit(self):
         nn = NN(
-            layer.FullyConnectedLayer(2, 4, activation.Linear()),
-            layer.FullyConnectedLayer(4, 1, activation.Linear()),
+            layer.Linear(2, 4),
+            activation.Linear(),
+            layer.Linear(4, 1),
+            activation.Linear(),
             optimizer=optim.SGD(learning_rate=0.01),
             loss_function=loss.MeanSquaredError(),
         )
@@ -60,7 +62,8 @@ class TestNN(unittest.TestCase):
 
     def test_sign_function_fit(self):
         nn = NN(
-            layer.FullyConnectedLayer(1, 1, activation.Sigmoid()),
+            layer.Linear(1, 1),
+            activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGD(learning_rate=0.1)
         )
@@ -129,10 +132,12 @@ class TestNN(unittest.TestCase):
 
     def test_not_gate_fit(self):
         nn = NN(
-            layer.FullyConnectedLayer(1, 2, activation.Sigmoid()),
-            layer.FullyConnectedLayer(2, 1, activation.Sigmoid()),
+            layer.Linear(1, 2),
+            activation.Sigmoid(),
+            layer.Linear(2, 1),
+            activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
-            optimizer=optim.SGD(learning_rate=0.1)
+            optimizer=optim.Adam(learning_rate=0.1)
         )
 
         data = np.array([[0],
@@ -163,8 +168,10 @@ class TestNN(unittest.TestCase):
 
     def test_and_gate_fit(self):
         nn = NN(
-            layer.FullyConnectedLayer(2, 2, activation.Sigmoid()),
-            layer.FullyConnectedLayer(2, 1, activation.Sigmoid()),
+            layer.Linear(2, 2),
+            activation.Sigmoid(),
+            layer.Linear(2, 1),
+            activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGD(learning_rate=0.1)
         )
@@ -207,10 +214,12 @@ class TestNN(unittest.TestCase):
 
     def test_or_gate_fit(self):
         nn = NN(
-            layer.FullyConnectedLayer(2, 2, activation.Sigmoid()),
-            layer.FullyConnectedLayer(2, 1, activation.Sigmoid()),
+            layer.Linear(2, 2),
+            activation.Sigmoid(),
+            layer.Linear(2, 1),
+            activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
-            optimizer=optim.SGD(learning_rate=0.5)
+            optimizer=optim.SGDMomentum(learning_rate=0.5)
         )
 
         data = np.array([[0, 0],
@@ -251,8 +260,10 @@ class TestNN(unittest.TestCase):
 
     def test_xor_gate_fit(self):
         nn = NN(
-            layer.FullyConnectedLayer(2, 4, activation.ReLU()),
-            layer.FullyConnectedLayer(4, 1, activation.Sigmoid()),
+            layer.Linear(2, 4),
+            activation.ReLU(),
+            layer.Linear(4, 1),
+            activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGD(learning_rate=0.5)
         )
@@ -300,9 +311,12 @@ class TestNN(unittest.TestCase):
         for seed in range(num_tests):
             np.random.seed(seed)
             nn = NN(
-                layer.FullyConnectedLayer(2, 16, activation.ReLU()),
-                layer.FullyConnectedLayer(16, 16, activation.ReLU()),
-                layer.FullyConnectedLayer(16, 1, activation.Sigmoid()),
+                layer.Linear(2, 16),
+                activation.ReLU(),
+                layer.Linear(16, 16),
+                activation.ReLU(),
+                layer.Linear(16, 1),
+                activation.Sigmoid(),
                 loss_function=loss.BinaryCrossEntropy(),
                 optimizer=optim.Adam(learning_rate=0.01)
             )
@@ -347,9 +361,12 @@ class TestNN(unittest.TestCase):
         hidden_size = 64
         radius = 0.5
         nn = NN(
-            layer.FullyConnectedLayer(2, hidden_size, activation.ReLU()),
-            layer.FullyConnectedLayer(hidden_size, hidden_size, activation.ReLU()),
-            layer.FullyConnectedLayer(hidden_size, 1, activation.Sigmoid()),
+            layer.Linear(2, hidden_size),
+            activation.ReLU(),
+            layer.Linear(hidden_size, hidden_size),
+            activation.ReLU(),
+            layer.Linear(hidden_size, 1),
+            activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.Adam(learning_rate=0.01)
         )

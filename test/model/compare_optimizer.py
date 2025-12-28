@@ -2,7 +2,7 @@ import numpy as np
 from _pytest import unittest
 
 from src.dataloader.datasets import CircleDataset
-from src.model import optimizer as optim, loss_function as loss, layer, activation_function as activation
+from src.model import optimizer as optim, loss_function as loss, module, activation_function as activation
 from src.model.network import NN
 
 
@@ -29,8 +29,8 @@ class OptimizerTest(unittest.TestCase):
             results_gradnorm[type(opt).__name__] = []
             for x in range(num_tests):
                 nn = NN(
-                    layer.FullyConnectedLayer(2, 4, activation.ReLU()),
-                    layer.FullyConnectedLayer(4, 1, activation.Linear()),
+                    layer.Linear(2, 4, activation.ReLU()),
+                    layer.Linear(4, 1, activation.Linear()),
                     loss_function=loss.MeanSquaredError(),
                     optimizer=opt
                 )
@@ -119,9 +119,9 @@ class OptimizerTest(unittest.TestCase):
             results_gradnorm[type(opt).__name__] = []
             for x in range(num_tests):
                 nn = NN(
-                    layer.FullyConnectedLayer(2, hidden_size, activation.ReLU()),
-                    layer.FullyConnectedLayer(hidden_size, hidden_size, activation.ReLU()),
-                    layer.FullyConnectedLayer(hidden_size, 1, activation.Linear()),
+                    layer.Linear(2, hidden_size, activation.ReLU()),
+                    layer.Linear(hidden_size, hidden_size, activation.ReLU()),
+                    layer.Linear(hidden_size, 1, activation.Linear()),
                     loss_function=loss.BinaryCrossEntropyLossFromLogits(),
                     optimizer=opt
                 )

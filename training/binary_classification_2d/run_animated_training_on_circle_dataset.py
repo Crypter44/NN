@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.model.network import NN
-from src.model import optimizer as optim, loss_function as loss, layer, activation_function as activation
+from src.model import optimizer as optim, loss_function as loss, module, activation_function as activation
 from src.dataloader.datasets import CircleDataset, PolygonDataset, SpiralDataset
 
 from src.utils import binary_classification_problem_2d as bcp2d
@@ -9,10 +9,10 @@ from src.utils import binary_classification_problem_2d as bcp2d
 hidden_size = 64
 radius = 0.5
 nn = NN(
-    layer.FullyConnectedLayer(2, hidden_size, activation.ReLU()),
-    layer.FullyConnectedLayer(hidden_size, hidden_size, activation.ReLU()),
-    layer.FullyConnectedLayer(hidden_size, hidden_size, activation.ReLU()),
-    layer.FullyConnectedLayer(hidden_size, 1, activation.Sigmoid()),
+    layer.Linear(2, hidden_size, activation.ReLU()),
+    layer.Linear(hidden_size, hidden_size, activation.ReLU()),
+    layer.Linear(hidden_size, hidden_size, activation.ReLU()),
+    layer.Linear(hidden_size, 1, activation.Sigmoid()),
     loss_function=loss.BinaryCrossEntropy(),
     optimizer=optim.Adam(learning_rate=0.001)
 )
