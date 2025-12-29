@@ -1,3 +1,7 @@
+"""
+Defines the base Module class and multiple neural network layers.
+"""
+
 import numpy as np
 
 from src.model.initialization import xavier_initialization
@@ -8,6 +12,11 @@ class Module:
     """
     Abstract base class for all neural network modules.
     """
+    TRAIN = 'train'
+    EVAL = 'eval'
+
+    def __init__(self):
+        self._mode = Module.TRAIN  # default mode is training
 
     def forward(self, x):
         """
@@ -40,8 +49,20 @@ class Module:
         """
         return self.forward(x)
 
+    def train(self):
+        """
+        Sets the module to training mode.
+        """
+        self._mode = Module.TRAIN
 
-class Linear(Module):
+    def eval(self):
+        """
+        Sets the module to evaluation mode.
+        """
+        self._mode = Module.EVAL
+
+
+class LinearLayer(Module):
     def __init__(self, input_dim, output_dim, include_bias=True, init_method=xavier_initialization):
         """
         Initializes the fully connected layer.
@@ -49,6 +70,7 @@ class Linear(Module):
         :param output_dim: Output dimension D_out
         :param include_bias: Whether to include bias term
         """
+        super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.cache = None
@@ -108,3 +130,43 @@ class Linear(Module):
         :return: List of parameters
         """
         return [self.W]
+
+class DropOut(Module):
+    def __init__(self, drop_prob=0.5):
+        """
+        Initializes the Dropout layer.
+        :param drop_prob: Probability of dropping a unit
+        """
+        super().__init__()
+        self.drop_prob = drop_prob
+        self.mask = None
+
+    def forward(self, x):
+        """
+        Performs the forward pass of the Dropout layer.
+        :param x: Input data
+        :return: Output data after applying dropout
+        """
+        if self._mode == Module.TRAIN:
+            self.mask = (np.random.rand(*x.shape) >= self.drop_prob) / (1.0 - self.drop_prob)
+            return x * self.mask
+        else:
+            return x
+
+    def backward(self, dout):
+        """
+        Performs the backward pass of the Dropout layer.
+        :param dout: Upstream gradient
+        :return: Gradient with respect to input
+        """
+        if self._mode == Module.TRAIN:
+            return dout * self.mask
+        else:
+            return dout
+
+    def parameters(self):
+        """
+        Returns the parameters of the Dropout layer (none).
+        :return: Empty list
+        """
+        return []

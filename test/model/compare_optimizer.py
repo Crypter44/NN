@@ -4,6 +4,7 @@ from _pytest import unittest
 from src.dataloader.datasets import CircleDataset
 from src.model import optimizer as optim, loss_function as loss, module, activation_function as activation
 from src.model.network import NN
+from src.utils.utils import outdated
 
 
 class OptimizerTest(unittest.TestCase):
@@ -13,6 +14,7 @@ class OptimizerTest(unittest.TestCase):
         targets = function(data).reshape(-1, 1)
         return data, targets
 
+    @outdated
     def test_compare_optimizers(self):
         optimizers = [
             optim.SGD(learning_rate=0.01),
@@ -29,8 +31,8 @@ class OptimizerTest(unittest.TestCase):
             results_gradnorm[type(opt).__name__] = []
             for x in range(num_tests):
                 nn = NN(
-                    layer.Linear(2, 4, activation.ReLU()),
-                    layer.Linear(4, 1, activation.Linear()),
+                    module.LinearLayer(2, 4, activation.ReLU()),
+                    module.LinearLayer(4, 1, activation.Linear()),
                     loss_function=loss.MeanSquaredError(),
                     optimizer=opt
                 )
@@ -98,6 +100,7 @@ class OptimizerTest(unittest.TestCase):
 
         self.assertFalse(at_least_one_fail, "At least one optimizer failed to converge in one of the tests.")
 
+    @outdated
     def test_compare_optimizers_on_circle(self):
         optimizers = [
             # optim.SGD(learning_rate=0.001),
@@ -119,9 +122,9 @@ class OptimizerTest(unittest.TestCase):
             results_gradnorm[type(opt).__name__] = []
             for x in range(num_tests):
                 nn = NN(
-                    layer.Linear(2, hidden_size, activation.ReLU()),
-                    layer.Linear(hidden_size, hidden_size, activation.ReLU()),
-                    layer.Linear(hidden_size, 1, activation.Linear()),
+                    module.LinearLayer(2, hidden_size, activation.ReLU()),
+                    module.LinearLayer(hidden_size, hidden_size, activation.ReLU()),
+                    module.LinearLayer(hidden_size, 1, activation.Linear()),
                     loss_function=loss.BinaryCrossEntropyLossFromLogits(),
                     optimizer=opt
                 )

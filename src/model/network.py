@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 from src.dataloader.dataloader import Dataloader
+from src.utils.utils import outdated
 
 
 class NN:
@@ -108,11 +109,13 @@ class NN:
         loss = self.loss_function(predictions, targets)
         return predictions, loss
 
+    @outdated
     def save_weights(self, filepath):
         weights = [layer.W for layer in self.layers]
         with open(filepath + ".pkl", "wb") as f:
             pickle.dump(weights, f)
 
+    @outdated
     def load_weights(self, filepath):
         with open(filepath + ".pkl", "rb") as f:
             weights = pickle.load(f)

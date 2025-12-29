@@ -9,10 +9,10 @@ from src.utils import binary_classification_problem_2d as bcp2d
 hidden_size = 64
 radius = 0.5
 nn = NN(
-    layer.Linear(2, hidden_size, activation.ReLU()),
-    layer.Linear(hidden_size, hidden_size, activation.ReLU()),
-    layer.Linear(hidden_size, hidden_size, activation.ReLU()),
-    layer.Linear(hidden_size, 1, activation.Sigmoid()),
+    module.LinearLayer(2, hidden_size, activation.ReLU()),
+    module.LinearLayer(hidden_size, hidden_size, activation.ReLU()),
+    module.LinearLayer(hidden_size, hidden_size, activation.ReLU()),
+    module.LinearLayer(hidden_size, 1, activation.Sigmoid()),
     loss_function=loss.BinaryCrossEntropy(),
     optimizer=optim.Adam(learning_rate=0.001)
 )
@@ -34,7 +34,6 @@ polygon_data = PolygonDataset(
     batch_size=128,
     shuffle=True,
     drop_last=True,
-    normalize_data=False
 )
 print("Polygon vertices:", polygon_data.polygon_vertices)
 
@@ -45,7 +44,6 @@ spiral_data = SpiralDataset(
     batch_size=128,
     shuffle=True,
     drop_last=True,
-    normalize_data=False
 )
 
 problem = bcp2d.BinaryClassification2DProblem(

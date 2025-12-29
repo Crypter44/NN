@@ -18,9 +18,9 @@ def set_seed():
 class TestNN(unittest.TestCase):
     def test_linear_function_fit(self):
         nn = NN(
-            layer.Linear(2, 4),
+            layer.LinearLayer(2, 4),
             activation.Linear(),
-            layer.Linear(4, 1),
+            layer.LinearLayer(4, 1),
             activation.Linear(),
             optimizer=optim.SGD(learning_rate=0.01),
             loss_function=loss.MeanSquaredError(),
@@ -62,7 +62,7 @@ class TestNN(unittest.TestCase):
 
     def test_sign_function_fit(self):
         nn = NN(
-            layer.Linear(1, 1),
+            layer.LinearLayer(1, 1),
             activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGD(learning_rate=0.1)
@@ -132,9 +132,9 @@ class TestNN(unittest.TestCase):
 
     def test_not_gate_fit(self):
         nn = NN(
-            layer.Linear(1, 2),
+            layer.LinearLayer(1, 2),
             activation.Sigmoid(),
-            layer.Linear(2, 1),
+            layer.LinearLayer(2, 1),
             activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.Adam(learning_rate=0.1)
@@ -168,9 +168,9 @@ class TestNN(unittest.TestCase):
 
     def test_and_gate_fit(self):
         nn = NN(
-            layer.Linear(2, 2),
+            layer.LinearLayer(2, 2),
             activation.Sigmoid(),
-            layer.Linear(2, 1),
+            layer.LinearLayer(2, 1),
             activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGD(learning_rate=0.1)
@@ -214,9 +214,9 @@ class TestNN(unittest.TestCase):
 
     def test_or_gate_fit(self):
         nn = NN(
-            layer.Linear(2, 2),
+            layer.LinearLayer(2, 2),
             activation.Sigmoid(),
-            layer.Linear(2, 1),
+            layer.LinearLayer(2, 1),
             activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGDMomentum(learning_rate=0.5)
@@ -260,9 +260,9 @@ class TestNN(unittest.TestCase):
 
     def test_xor_gate_fit(self):
         nn = NN(
-            layer.Linear(2, 4),
+            layer.LinearLayer(2, 4),
             activation.ReLU(),
-            layer.Linear(4, 1),
+            layer.LinearLayer(4, 1),
             activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.SGD(learning_rate=0.5)
@@ -311,11 +311,11 @@ class TestNN(unittest.TestCase):
         for seed in range(num_tests):
             np.random.seed(seed)
             nn = NN(
-                layer.Linear(2, 16),
+                layer.LinearLayer(2, 16),
                 activation.ReLU(),
-                layer.Linear(16, 16),
+                layer.LinearLayer(16, 16),
                 activation.ReLU(),
-                layer.Linear(16, 1),
+                layer.LinearLayer(16, 1),
                 activation.Sigmoid(),
                 loss_function=loss.BinaryCrossEntropy(),
                 optimizer=optim.Adam(learning_rate=0.01)
@@ -361,11 +361,11 @@ class TestNN(unittest.TestCase):
         hidden_size = 64
         radius = 0.5
         nn = NN(
-            layer.Linear(2, hidden_size),
+            layer.LinearLayer(2, hidden_size),
             activation.ReLU(),
-            layer.Linear(hidden_size, hidden_size),
+            layer.LinearLayer(hidden_size, hidden_size),
             activation.ReLU(),
-            layer.Linear(hidden_size, 1),
+            layer.LinearLayer(hidden_size, 1),
             activation.Sigmoid(),
             loss_function=loss.BinaryCrossEntropy(),
             optimizer=optim.Adam(learning_rate=0.01)

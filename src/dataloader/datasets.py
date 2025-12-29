@@ -159,7 +159,6 @@ class MNISTDataset(Dataloader):
         self.train = train
 
         data, targets = self.load_mnist(root, train=train)
-        print(data.shape, targets.shape)
         super().__init__(data, targets, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, transformation=transformation)
 
     @staticmethod

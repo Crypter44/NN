@@ -11,7 +11,7 @@ class TestFcLayer(unittest.TestCase):
         # Create a FullyConnectedLayer instance
         input_size = 2
         output_size = 1
-        fc_layer = mdl.Linear(input_size, output_size, include_bias=False)
+        fc_layer = mdl.LinearLayer(input_size, output_size, include_bias=False)
 
         assert fc_layer.W.shape == (input_size, output_size), \
             f"Weight matrix shape expected to be {(input_size, output_size)}, but got {fc_layer.W.shape}"
@@ -35,7 +35,7 @@ class TestFcLayer(unittest.TestCase):
         # Create a FullyConnectedLayer instance
         input_size = 2
         output_size = 1
-        fc_layer = mdl.Linear(input_size, output_size, include_bias=True)
+        fc_layer = mdl.LinearLayer(input_size, output_size, include_bias=True)
 
         data = np.array([[0.0, 0.0],
                          [1.0, 1.0],

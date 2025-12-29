@@ -2,8 +2,8 @@ import numpy as np
 
 from src.dataloader.datasets import MNISTDataset
 from src.dataloader.transformation import RandomTranslationWithPadding, ChainTransformation, Flatten
-from src.model.activation_function import ReLU, Linear
-from src.model.module import Linear
+from src.model import activation_function as af
+from src.model.module import LinearLayer, DropOut
 from src.model.loss_function import SoftmaxCrossEntropy
 from src.model.network import NN
 from src.model.optimizer import Adam
@@ -12,13 +12,15 @@ from src.utils.utils import plot_loss_curve, set_seed
 
 set_seed(526)
 
+image_size = 28
+
 data = MNISTDataset(
     train=True,
     batch_size=64,
     shuffle=True,
     drop_last=True,
     transformation=ChainTransformation(
-        RandomTranslationWithPadding((40, 40)),
+        RandomTranslationWithPadding((image_size, image_size)),
         Flatten()
     )
 
@@ -27,9 +29,14 @@ data = MNISTDataset(
 print("MNIST train dataset loaded.")
 
 nn = NN(
-    Linear(1600, 512, activation=ReLU()),
-    Linear(512, 64, activation=ReLU()),
-    Linear(64, 10, activation=Linear()),
+    DropOut(0.2),
+    LinearLayer(image_size ** 2, 512),
+    af.ReLU(),
+    DropOut(),
+    LinearLayer(512, 64),
+    af.ReLU(),
+    LinearLayer(64, 10),
+    af.Linear(),
     loss_function=SoftmaxCrossEntropy(),
     optimizer=Adam(learning_rate=0.001),
 )
@@ -39,13 +46,16 @@ loss_list, grad_norm_list = nn.train(data, epochs=45)
 print("Training completed.")
 
 # plot loss curve
+for layer in nn.layers:
+    layer.eval()
+
 plot_loss_curve(loss_list)
 
 images, labels = next(iter(data))
 
 # Visualize some predictions
 plot_images_with_colored_labels(
-    images.reshape(-1, 40, 40),
+    images.reshape(-1, image_size, image_size),
     nn(images).argmax(axis=1).astype(int),
     labels.argmax(axis=1).astype(int),
 )
@@ -53,7 +63,7 @@ plot_images_with_colored_labels(
 # calculate accuracy on train set
 train_predictions = nn(data.data).argmax(axis=1).astype(int)
 train_accuracy = np.mean(train_predictions == data.targets.argmax(axis=1).astype(int))
-print(f"Train accuracy: {train_accuracy * 100:.2f}%")
+print(f"Train accuracy: {train_accuracy * 100:.4f}%")
 
 # test set
 test_data = MNISTDataset(
@@ -62,7 +72,7 @@ test_data = MNISTDataset(
     shuffle=False,
     drop_last=False,
     transformation=ChainTransformation(
-        RandomTranslationWithPadding((40, 40)),
+        RandomTranslationWithPadding((image_size, image_size)),
         Flatten()
     )
 )
@@ -72,6 +82,6 @@ test_predictions = nn(test_images).argmax(axis=1).astype(int)
 
 # calculate test accuracy
 test_accuracy = np.mean(test_predictions == test_labels.argmax(axis=1).astype(int))
-print(f"Test accuracy: {test_accuracy * 100:.2f}%")
+print(f"Test accuracy: {test_accuracy * 100:.4f}%")
 
-nn.save_weights("weights")
+#nn.save_weights("weights")
