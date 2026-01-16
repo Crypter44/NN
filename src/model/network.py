@@ -38,7 +38,7 @@ class NN:
         for layer in self.layers:
             layer.eval()
 
-    def run_training(self, data, epochs=100, **kwargs) -> dict:
+    def run_training(self, data, epochs=100, eval_data: Dataloader = None, **kwargs) -> dict:
         """
         Trains the neural network on the given data for a number of epochs.
 
@@ -46,6 +46,7 @@ class NN:
         shuffle=False, drop_last=False, to simulate full-batch training on the provided data.
         :param data: data to train on (Dataloader or tuple of (data, targets))
         :param epochs: number of epochs to train for
+        :param eval_data: optional evaluation data to evaluate on after each epoch
         :kwargs: additional arguments (not used, but currently needed for backwards compatibility from older versions)
         :return: info dictionary containing various training statistics
         """
@@ -59,12 +60,19 @@ class NN:
             data.print(True)
             print(f"Data converted to Dataloader with batch_size={batch_size}, shuffle=False, drop_last=False.")
 
+        # set up info dictionary
         info = {
             'loss_list': [],
             'grad_norm_list': []
         }
+        if eval_data is not None:
+            info['eval_loss_list'] = []
+        patience = kwargs.get('patience', 10)
+        best_loss = np.inf
 
+        # Training loop
         for epoch in range(epochs):
+            self.train()
             batch_loss = 0
             batch_grad_norm = 0
 
@@ -86,7 +94,30 @@ class NN:
             info["loss_list"].append(batch_loss / data.num_batches())
             info["grad_norm_list"].append(batch_grad_norm / data.num_batches())
 
-            tqdm.write(f"Epoch {epoch + 1}/{epochs}: Loss: {info['loss_list'][-1]:.4f}")
+            # Evaluation for early stopping or monitoring
+            if eval_data is not None:
+                self.eval()
+                eval_predictions, eval_loss = self.evaluate(eval_data)
+                info["eval_loss_list"].append(eval_loss)
+                if eval_loss < best_loss:
+                    best_loss = eval_loss
+                    self.save_weights("best_model_weights")
+                    patience = kwargs.get('patience', 10)
+                else:
+                    patience -= 1
+                    if patience == 0:
+                        print("Early stopping triggered.")
+                        self.load_weights("best_model_weights")
+                        return info
+
+
+            tqdm.write(
+                f"Epoch {epoch + 1}/{epochs}: "
+                f"          Loss: {info['loss_list'][-1]:.4f}, "
+                f"          Grad Norm: {info['grad_norm_list'][-1]:.4f}"
+                f"          Eval Loss: {info['eval_loss_list'][-1]:.4f}" if eval_data is not None else "N/A"
+                f"          Patience: {patience}" if eval_data is not None else "N/A"
+            )
 
         return info
 

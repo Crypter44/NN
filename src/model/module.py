@@ -4,7 +4,7 @@ Defines the base Module class and multiple neural network layers.
 
 import numpy as np
 
-from src.model.initialization import xavier_initialization
+from src.model.initialization import XavierInitialization
 from src.model.parameter import Parameter
 
 
@@ -63,7 +63,7 @@ class Module:
 
 
 class LinearLayer(Module):
-    def __init__(self, input_dim, output_dim, include_bias=True, init_method=xavier_initialization):
+    def __init__(self, input_dim, output_dim, include_bias=True, init_method=XavierInitialization()):
         """
         Initializes the fully connected layer.
         :param input_dim: Input dimension D_in

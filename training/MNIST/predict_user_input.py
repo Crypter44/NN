@@ -6,10 +6,8 @@ from src.model.optimizer import Adam
 from src.utils.number_painter_MNIST import MNISTDrawer
 
 nn = NN(
-    DropOut(0.2),
     LinearLayer(40 ** 2, 512),
     ReLU(),
-    DropOut(),
     LinearLayer(512, 64),
     ReLU(),
     LinearLayer(64, 10),

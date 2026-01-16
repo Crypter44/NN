@@ -3,6 +3,7 @@ import numpy as np
 from src.dataloader.datasets import MNISTDataset
 from src.dataloader.transformation import RandomTranslationWithPadding, ChainTransformation, Flatten
 from src.model import activation_function as af
+from src.model.initialization import XavierInitializationNormal
 from src.model.module import LinearLayer, DropOut
 from src.model.loss_function import SoftmaxCrossEntropy
 from src.model.network import NN
@@ -29,20 +30,20 @@ data = MNISTDataset(
 print("MNIST train dataset loaded.")
 
 nn = NN(
-    DropOut(0.2),
-    LinearLayer(image_size ** 2, 512),
+    #DropOut(0.2),
+    LinearLayer(image_size ** 2, 512, init_method=XavierInitializationNormal(True)),
     af.ReLU(),
-    DropOut(),
-    LinearLayer(512, 64),
+    #DropOut(),
+    LinearLayer(512, 64, init_method=XavierInitializationNormal(True)),
     af.ReLU(),
-    LinearLayer(64, 10),
+    LinearLayer(64, 10, init_method=XavierInitializationNormal(True)),
     af.Linear(),
     loss_function=SoftmaxCrossEntropy(),
     optimizer=Adam(learning_rate=0.001),
 )
 
 nn.train()
-loss_list, grad_norm_list = nn.run_training(data, epochs=5).values()
+loss_list, grad_norm_list = nn.run_training(data, epochs=45).values()
 
 print("Training completed.")
 
