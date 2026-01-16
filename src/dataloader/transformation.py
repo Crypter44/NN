@@ -43,7 +43,7 @@ class RandomTranslationWithPadding(Transformation):
         new_shape = (data.shape[0],) + self.dims_after_transform
         empty = np.zeros(new_shape)
         data_shape = data.shape
-        max_translations = [self.dims_after_transform[i-1] - data_shape[i] for i in range(1, len(data_shape))]
+        #max_translations = [self.dims_after_transform[i-1] - data_shape[i] for i in range(1, len(data_shape))]
         max_translations = [self.dims_after_transform[i] - data_shape[i + 1] for i in range(len(self.dims_after_transform))]
         for j in range(data_shape[0]):
             translations = [np.random.randint(0, max_translations[i-1] + 1) for i in range(1, len(data_shape))]

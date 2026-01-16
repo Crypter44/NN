@@ -12,7 +12,7 @@ from src.utils.utils import plot_loss_curve, set_seed
 
 set_seed(526)
 
-image_size = 28
+image_size = 40
 
 data = MNISTDataset(
     train=True,
@@ -41,14 +41,12 @@ nn = NN(
     optimizer=Adam(learning_rate=0.001),
 )
 
-loss_list, grad_norm_list = nn.train(data, epochs=45)
+nn.train()
+loss_list, grad_norm_list = nn.run_training(data, epochs=5).values()
 
 print("Training completed.")
 
-# plot loss curve
-for layer in nn.layers:
-    layer.eval()
-
+nn.eval()
 plot_loss_curve(loss_list)
 
 images, labels = next(iter(data))
@@ -84,4 +82,4 @@ test_predictions = nn(test_images).argmax(axis=1).astype(int)
 test_accuracy = np.mean(test_predictions == test_labels.argmax(axis=1).astype(int))
 print(f"Test accuracy: {test_accuracy * 100:.4f}%")
 
-#nn.save_weights("weights")
+nn.save_weights("weights")

@@ -38,10 +38,10 @@ class BinaryClassification2DProblem:
 
         pbar = tqdm.tqdm(range(1, epochs + 1))
         for i in pbar:
-            l, g = self.model.train(
+            l, g = self.model.run_training(
                 data=self.train_set,
                 epochs=1,
-            )
+            ).values()
             losses.append(l[-1])
             grad_norms.append(g[-1])
 

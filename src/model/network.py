@@ -24,7 +24,21 @@ class NN:
         for layer in self.layers:
             self.optimizer.register_parameters(layer.parameters())
 
-    def train(self, data, epochs=100, **kwargs):
+    def train(self):
+        """
+        Sets all layers to training mode.
+        """
+        for layer in self.layers:
+            layer.train()
+
+    def eval(self):
+        """
+        Sets all layers to evaluation mode.
+        """
+        for layer in self.layers:
+            layer.eval()
+
+    def run_training(self, data, epochs=100, **kwargs) -> dict:
         """
         Trains the neural network on the given data for a number of epochs.
 
@@ -33,8 +47,7 @@ class NN:
         :param data: data to train on (Dataloader or tuple of (data, targets))
         :param epochs: number of epochs to train for
         :kwargs: additional arguments (not used, but currently needed for backwards compatibility from older versions)
-        :return: loss_list: list of losses for each batch,
-                 grad_norm_list: list of gradient norms for each layer and batch
+        :return: info dictionary containing various training statistics
         """
         if not isinstance(data, Dataloader):
             warnings.warn(
@@ -46,37 +59,61 @@ class NN:
             data.print(True)
             print(f"Data converted to Dataloader with batch_size={batch_size}, shuffle=False, drop_last=False.")
 
-        loss_list = []
-        grad_norm_list = []
+        info = {
+            'loss_list': [],
+            'grad_norm_list': []
+        }
 
-        pbar = tqdm(range(epochs), desc="Training", unit="epoch")
+        for epoch in range(epochs):
+            batch_loss = 0
+            batch_grad_norm = 0
 
-        for epoch in pbar:
-            batch_loss_list = []
-            batch_grad_norm_list = []
-            for batch in data:
+            pbar = tqdm(data, desc=f"Epoch {epoch + 1}/{epochs}", unit="batch")
+            for batch in pbar:
                 data_batch, targets_batch = batch
                 # Forward pass
-                output = data_batch
-                for layer in self.layers:
-                    output = layer.forward(output)
-
+                output = self.forward(data_batch)
                 # Compute loss
                 loss = self.loss_function(output, targets_batch)
-                batch_loss_list.append(loss)
-
+                batch_loss += loss
                 # Backward pass
-                grad = self.loss_function.backward(output, targets_batch)
-                for layer in reversed(self.layers):
-                    grad = layer.backward(grad)
-                    batch_grad_norm_list.append(np.linalg.norm(grad))
-                self.optimizer.step()
                 self.optimizer.zero_grad()
-            loss_list.append(np.mean(batch_loss_list))
-            grad_norm_list.append(np.mean(batch_grad_norm_list))
-            pbar.set_postfix({'loss': np.round(loss_list[-1], 4), 'grad_norm': np.round(grad_norm_list[-1], 4)})
+                grad_norm = self.backward(output, targets_batch)
+                batch_grad_norm += grad_norm
+                # optimize
+                self.optimizer.step()
 
-        return loss_list, grad_norm_list
+            info["loss_list"].append(batch_loss / data.num_batches())
+            info["grad_norm_list"].append(batch_grad_norm / data.num_batches())
+
+            tqdm.write(f"Epoch {epoch + 1}/{epochs}: Loss: {info['loss_list'][-1]:.4f}")
+
+        return info
+
+    def forward(self, input_data):
+        """
+        Performs a forward pass through the network.
+        :param input_data: the input data
+        :return: the output after passing through all layers
+        """
+        output = input_data
+        for layer in self.layers:
+            output = layer.forward(output)
+        return output
+
+    def backward(self, output, targets):
+        """
+        Performs a backward pass through the network.
+        :param input_data: the gradient of the loss with respect to the output
+        :return: the norm of the gradients across all layers
+        """
+        grad = self.loss_function.backward(output, targets)
+        grad_norm = np.linalg.norm(grad)
+        for layer in reversed(self.layers):
+            grad = layer.backward(grad)
+            grad_norm += np.linalg.norm(grad)
+
+        return grad_norm / len(self.layers)
 
     def predict(self, input_data):
         """
@@ -84,10 +121,7 @@ class NN:
         :param input_data: the input data
         :return: the predicted output
         """
-        output = input_data
-        for layer in self.layers:
-            output = layer.forward(output)
-        return output
+        return self.forward(input_data)
 
     def __call__(self, *args, **kwargs):
         """
@@ -109,15 +143,14 @@ class NN:
         loss = self.loss_function(predictions, targets)
         return predictions, loss
 
-    @outdated
     def save_weights(self, filepath):
-        weights = [layer.W for layer in self.layers]
+        weights = [layer.parameters() for layer in self.layers]
         with open(filepath + ".pkl", "wb") as f:
             pickle.dump(weights, f)
 
-    @outdated
     def load_weights(self, filepath):
         with open(filepath + ".pkl", "rb") as f:
             weights = pickle.load(f)
-        for w, layer in zip(weights, self.layers):
-            layer.W = w
+        for parameters, layer in zip(weights, self.layers):
+            for p, lp in zip(parameters, layer.parameters()):
+                lp[...] = deepcopy(p)

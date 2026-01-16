@@ -96,6 +96,23 @@ class Dataloader:
         targets = self.targets[item]
         return batch, targets
 
+    def __len__(self):
+        """
+        Returns the number of samples in the dataloader.
+        :return: number of samples
+        """
+        return self.num_batches()
+
+    def num_batches(self):
+        """
+        Returns the number of batches in the dataloader.
+        :return: number of batches
+        """
+        if self.drop_last:
+            return len(self.data) // self.batch_size
+        else:
+            return (len(self.data) + self.batch_size - 1) // self.batch_size
+
     @staticmethod
     def train_and_eval_split(data, targets, train_fraction=0.8, **dataloader_kwargs):
         """

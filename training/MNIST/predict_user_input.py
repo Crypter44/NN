@@ -1,14 +1,19 @@
 from src.model.activation_function import Linear, ReLU
-from src.model.module import LinearLayer
+from src.model.module import LinearLayer, DropOut
 from src.model.loss_function import SoftmaxCrossEntropy
 from src.model.network import NN
 from src.model.optimizer import Adam
 from src.utils.number_painter_MNIST import MNISTDrawer
 
 nn = NN(
-    LinearLayer(1600, 512, activation=ReLU()),
-    LinearLayer(512, 64, activation=ReLU()),
-    LinearLayer(64, 10, activation=LinearLayer()),
+    DropOut(0.2),
+    LinearLayer(40 ** 2, 512),
+    ReLU(),
+    DropOut(),
+    LinearLayer(512, 64),
+    ReLU(),
+    LinearLayer(64, 10),
+    Linear(),
     loss_function=SoftmaxCrossEntropy(),
     optimizer=Adam(learning_rate=0.001),
 )
