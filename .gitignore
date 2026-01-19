@@ -4,3 +4,14 @@
 downloaded_data/
 
 *.mp4
+
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+__pypackages__/
+.env
+.env.*
+.vscode/
+.DS_Store
+.ipynb_checkpoints
