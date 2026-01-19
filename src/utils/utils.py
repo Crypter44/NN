@@ -1,4 +1,4 @@
-def plot_loss_curve(loss_list):
+def plot_loss_curve(loss_list, eval_loss_list=None):
     """
     Plots the loss curve over training iterations.
 
@@ -8,6 +8,8 @@ def plot_loss_curve(loss_list):
 
     plt.figure(figsize=(10, 6))
     plt.plot(loss_list, label='Loss', color='blue')
+    if eval_loss_list is not None:
+        plt.plot(eval_loss_list, label='Eval Loss', color='orange')
     plt.title('Loss Curve')
     plt.xlabel('Iteration')
     plt.ylabel('Loss')

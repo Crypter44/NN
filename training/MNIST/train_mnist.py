@@ -27,13 +27,24 @@ data = MNISTDataset(
 
 )
 
+test_data = MNISTDataset(
+    train=False,
+    batch_size=-1,
+    shuffle=False,
+    drop_last=False,
+    transformation=ChainTransformation(
+        RandomTranslationWithPadding((image_size, image_size)),
+        Flatten()
+    )
+)
+
 print("MNIST train dataset loaded.")
 
 nn = NN(
-    #DropOut(0.2),
+    DropOut(0.05),
     LinearLayer(image_size ** 2, 512, init_method=XavierInitializationNormal(True)),
     af.ReLU(),
-    #DropOut(),
+    DropOut(0.2),
     LinearLayer(512, 64, init_method=XavierInitializationNormal(True)),
     af.ReLU(),
     LinearLayer(64, 10, init_method=XavierInitializationNormal(True)),
@@ -43,12 +54,15 @@ nn = NN(
 )
 
 nn.train()
-loss_list, grad_norm_list = nn.run_training(data, epochs=45).values()
+info = nn.run_training(data, epochs=100, eval_data=test_data, patience=5)
+
+loss_list = info["train_loss"]
+eval_loss_list = info["eval_loss"]
 
 print("Training completed.")
 
 nn.eval()
-plot_loss_curve(loss_list)
+plot_loss_curve(loss_list, eval_loss_list)
 
 images, labels = next(iter(data))
 
@@ -63,18 +77,6 @@ plot_images_with_colored_labels(
 train_predictions = nn(data.data).argmax(axis=1).astype(int)
 train_accuracy = np.mean(train_predictions == data.targets.argmax(axis=1).astype(int))
 print(f"Train accuracy: {train_accuracy * 100:.4f}%")
-
-# test set
-test_data = MNISTDataset(
-    train=False,
-    batch_size=-1,
-    shuffle=False,
-    drop_last=False,
-    transformation=ChainTransformation(
-        RandomTranslationWithPadding((image_size, image_size)),
-        Flatten()
-    )
-)
 
 test_images, test_labels = next(iter(test_data))
 test_predictions = nn(test_images).argmax(axis=1).astype(int)

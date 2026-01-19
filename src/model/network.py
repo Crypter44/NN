@@ -62,11 +62,11 @@ class NN:
 
         # set up info dictionary
         info = {
-            'loss_list': [],
-            'grad_norm_list': []
+            'train_loss': [],
+            'grad_norm': []
         }
         if eval_data is not None:
-            info['eval_loss_list'] = []
+            info['eval_loss'] = []
         patience = kwargs.get('patience', 10)
         best_loss = np.inf
 
@@ -91,14 +91,14 @@ class NN:
                 # optimize
                 self.optimizer.step()
 
-            info["loss_list"].append(batch_loss / data.num_batches())
-            info["grad_norm_list"].append(batch_grad_norm / data.num_batches())
+            info["train_loss"].append(batch_loss / data.num_batches())
+            info["grad_norm"].append(batch_grad_norm / data.num_batches())
 
             # Evaluation for early stopping or monitoring
             if eval_data is not None:
                 self.eval()
-                eval_predictions, eval_loss = self.evaluate(eval_data)
-                info["eval_loss_list"].append(eval_loss)
+                eval_predictions, eval_loss = self.evaluate(eval_data.data, eval_data.targets)
+                info["eval_loss"].append(eval_loss)
                 if eval_loss < best_loss:
                     best_loss = eval_loss
                     self.save_weights("best_model_weights")
@@ -110,13 +110,11 @@ class NN:
                         self.load_weights("best_model_weights")
                         return info
 
-
             tqdm.write(
-                f"Epoch {epoch + 1}/{epochs}: "
-                f"          Loss: {info['loss_list'][-1]:.4f}, "
-                f"          Grad Norm: {info['grad_norm_list'][-1]:.4f}"
-                f"          Eval Loss: {info['eval_loss_list'][-1]:.4f}" if eval_data is not None else "N/A"
-                f"          Patience: {patience}" if eval_data is not None else "N/A"
+                    f"     Loss:          {info['train_loss'][-1]:.4f}, \n"
+                + ( f"     Eval Loss:     {info['eval_loss'][-1]:.4f}\n" if eval_data is not None else "")
+                +   f"     Grad Norm:     {info['grad_norm'][-1]:.4f}\n"
+                + ( f"     Patience:      {patience}" if eval_data is not None else "")
             )
 
         return info

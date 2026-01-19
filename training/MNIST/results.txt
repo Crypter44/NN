@@ -1,8 +1,0 @@
-FF 28x28:
-    MNIST train dataset loaded.
-    Training: 100%|██████████| 45/45 [05:54<00:00,  7.88s/epoch, loss=0.034, grad_norm=0.003]
-    Training completed.
-    Train accuracy: 99.4367%
-    Test accuracy: 97.6100%
-
-FF 28x28 (with Dropout):
